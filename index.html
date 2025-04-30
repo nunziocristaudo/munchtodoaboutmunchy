@@ -62,6 +62,7 @@
 </head>
 <body oncontextmenu="return false">
   <div id="media-container"></div>
+
   <script>
     // 🕵️ Secret: The answers float at midnight.
 
@@ -144,11 +145,11 @@
     }
     document.head.appendChild(style);
 
-    // Register service worker
+    // ✅ Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/service-worker.js')
         .then(() => console.log("✅ Service Worker registered"))
-        .catch((err) => console.error("Service Worker error:", err));
+        .catch((err) => console.error("❌ Service Worker error:", err));
     }
   </script>
 </body>
