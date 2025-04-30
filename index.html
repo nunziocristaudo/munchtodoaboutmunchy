@@ -30,6 +30,24 @@
       opacity: 1;
       z-index: 999;
     }
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .lightbox img,
+    .lightbox video {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 10px;
+    }
   </style>
 </head>
 <body>
@@ -55,10 +73,25 @@
             el.muted = true;
             el.loop = true;
           }
+          el.addEventListener("click", () => openLightbox(file, isVideo));
           container.appendChild(el);
         });
       })
       .catch((err) => console.error("Failed to load media manifest:", err));
+
+    function openLightbox(src, isVideo) {
+      const lightbox = document.createElement("div");
+      lightbox.className = "lightbox";
+      const content = isVideo ? document.createElement("video") : document.createElement("img");
+      content.src = src;
+      if (isVideo) {
+        content.controls = true;
+        content.autoplay = true;
+      }
+      lightbox.appendChild(content);
+      lightbox.addEventListener("click", () => document.body.removeChild(lightbox));
+      document.body.appendChild(lightbox);
+    }
 
     const style = document.createElement("style");
     for (let i = 0; i < 5; i++) {
