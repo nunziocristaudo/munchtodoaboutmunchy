@@ -15,27 +15,6 @@
       background: #111;
       font-family: sans-serif;
     }
-    #start-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #111;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      cursor: pointer;
-    }
-    #start-overlay button {
-      font-size: 1.5rem;
-      padding: 1em 2em;
-      border: none;
-      border-radius: 10px;
-      background: #fff;
-      color: #000;
-    }
     #media-container {
       position: relative;
       width: 100vw;
@@ -75,70 +54,63 @@
   </style>
 </head>
 <body oncontextmenu="return false">
-  <div id="start-overlay">
-    <button>Enter Fullscreen</button>
-  </div>
-
   <div id="media-container"></div>
-
   <script>
     // 🕵️ Secret: The answers float at midnight.
 
     document.addEventListener("contextmenu", (e) => e.preventDefault());
 
-    const startOverlay = document.getElementById("start-overlay");
+    // Request fullscreen on page load
+    document.addEventListener("DOMContentLoaded", () => {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+    });
+
     const container = document.getElementById("media-container");
     const screenW = window.innerWidth;
     const screenH = window.innerHeight;
 
     let sheepClicks = 0;
 
-    startOverlay.addEventListener("click", () => {
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch((err) => {
-          console.warn("Fullscreen request denied:", err);
-        });
-      }
-      startOverlay.style.display = "none";
+    fetch("media_manifest.json")
+      .then((res) => res.json())
+      .then((files) => {
+        // Adjust media count based on screen size
+        let maxItems = 100;
+        if (screenW < 768) maxItems = 30;          // small devices
+        else if (screenW < 1200) maxItems = 60;    // tablets/small laptops
 
-      fetch("media_manifest.json")
-        .then((res) => res.json())
-        .then((files) => {
-          let maxItems = 100;
-          if (screenW < 768) maxItems = 30;
-          else if (screenW < 1200) maxItems = 60;
+        const shuffled = files.sort(() => 0.5 - Math.random()).slice(0, maxItems);
 
-          const shuffled = files.sort(() => 0.5 - Math.random()).slice(0, maxItems);
-
-          shuffled.forEach((file, index) => {
-            const isVideo = file.endsWith(".mp4");
-            const el = isVideo ? document.createElement("video") : document.createElement("img");
-            el.src = file;
-            el.className = "media";
-            el.style.left = Math.random() * screenW + "px";
-            el.style.top = Math.random() * screenH + "px";
-            el.style.animation = `float${index % 5} ${20 + Math.random() * 30}s linear infinite`;
-            if (isVideo) {
-              el.autoplay = true;
-              el.muted = true;
-              el.loop = true;
-              el.controlsList = "nodownload";
-            }
-            el.addEventListener("click", () => {
-              openLightbox(file, isVideo);
-              if (file.toLowerCase().includes("sheep")) {
-                sheepClicks++;
-                if (sheepClicks === 3) {
-                  alert("✨ Clue unlocked: Midnight isn’t always on the clock.");
-                  sheepClicks = 0;
-                }
+        shuffled.forEach((file, index) => {
+          const isVideo = file.endsWith(".mp4");
+          const el = isVideo ? document.createElement("video") : document.createElement("img");
+          el.src = file;
+          el.className = "media";
+          el.style.left = Math.random() * screenW + "px";
+          el.style.top = Math.random() * screenH + "px";
+          el.style.animation = float${index % 5} ${20 + Math.random() * 30}s linear infinite;
+          if (isVideo) {
+            el.autoplay = true;
+            el.muted = true;
+            el.loop = true;
+            el.controlsList = "nodownload";
+          }
+          el.addEventListener("click", () => {
+            openLightbox(file, isVideo);
+            if (file.toLowerCase().includes("sheep")) {
+              sheepClicks++;
+              if (sheepClicks === 3) {
+                alert("✨ Clue unlocked: Midnight isn’t always on the clock.");
+                sheepClicks = 0;
               }
-            });
-            container.appendChild(el);
+            }
           });
-        })
-        .catch((err) => console.error("Failed to load media manifest:", err));
-    });
+          container.appendChild(el);
+        });
+      })
+      .catch((err) => console.error("Failed to load media manifest:", err));
 
     function openLightbox(src, isVideo) {
       const lightbox = document.createElement("div");
@@ -157,7 +129,7 @@
 
     const style = document.createElement("style");
     for (let i = 0; i < 5; i++) {
-      style.innerHTML += `
+      style.innerHTML += 
         @keyframes float${i} {
           0% {
             transform: translateY(0) translateX(0);
@@ -169,7 +141,7 @@
             transform: translateY(0) translateX(0);
           }
         }
-      `;
+      ;
     }
     document.head.appendChild(style);
   </script>
