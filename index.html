@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>munch of a munchyness</title>
+  <title>Wandering Archive</title>
   <link rel="stylesheet" href="style.css" />
   <style>
     body {
@@ -35,33 +35,30 @@
 <body>
   <div id="media-container"></div>
   <script>
-    const files = [
-      "media/9sd82d.webp",
-      "media/d0a9a2.mp4",
-      "media/b82fj3.webp",
-      "media/ff91hh.mp4"
-      // Add more filenames here as you upload
-    ];
-
     const container = document.getElementById("media-container");
     const screenW = window.innerWidth;
     const screenH = window.innerHeight;
 
-    files.forEach((file, index) => {
-      const isVideo = file.endsWith(".mp4");
-      const el = isVideo ? document.createElement("video") : document.createElement("img");
-      el.src = file;
-      el.className = "media";
-      el.style.left = Math.random() * screenW + "px";
-      el.style.top = Math.random() * screenH + "px";
-      el.style.animation = `float${index % 5} ${20 + Math.random() * 30}s linear infinite`;
-      if (isVideo) {
-        el.autoplay = true;
-        el.muted = true;
-        el.loop = true;
-      }
-      container.appendChild(el);
-    });
+    fetch("media_manifest.json")
+      .then((res) => res.json())
+      .then((files) => {
+        files.forEach((file, index) => {
+          const isVideo = file.endsWith(".mp4");
+          const el = isVideo ? document.createElement("video") : document.createElement("img");
+          el.src = file;
+          el.className = "media";
+          el.style.left = Math.random() * screenW + "px";
+          el.style.top = Math.random() * screenH + "px";
+          el.style.animation = `float${index % 5} ${20 + Math.random() * 30}s linear infinite`;
+          if (isVideo) {
+            el.autoplay = true;
+            el.muted = true;
+            el.loop = true;
+          }
+          container.appendChild(el);
+        });
+      })
+      .catch((err) => console.error("Failed to load media manifest:", err));
 
     const style = document.createElement("style");
     for (let i = 0; i < 5; i++) {
