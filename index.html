@@ -60,6 +60,8 @@
     const screenW = window.innerWidth;
     const screenH = window.innerHeight;
 
+    let sheepClicks = 0;
+
     fetch("media_manifest.json")
       .then((res) => res.json())
       .then((files) => {
@@ -76,7 +78,16 @@
             el.muted = true;
             el.loop = true;
           }
-          el.addEventListener("click", () => openLightbox(file, isVideo));
+          el.addEventListener("click", () => {
+            openLightbox(file, isVideo);
+            if (file.toLowerCase().includes("sheep")) {
+              sheepClicks++;
+              if (sheepClicks === 3) {
+                alert("✨ Clue unlocked: Midnight isn’t always on the clock.");
+                sheepClicks = 0;
+              }
+            }
+          });
           container.appendChild(el);
         });
       })
