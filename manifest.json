@@ -1,8 +1,8 @@
 {
   "name": "munchtodoaboutmunchy",
   "short_name": "munchy",
-  "start_url": "./?homescreen=1",
-  "scope": "./",
+  "start_url": "/munchtodoaboutmunchy/index.html?homescreen=1",
+  "scope": "/munchtodoaboutmunchy/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#111111",
