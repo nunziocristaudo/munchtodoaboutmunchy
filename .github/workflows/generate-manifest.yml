@@ -16,14 +16,16 @@ jobs:
         with:
           node-version: 18
 
+      - name: Install Node.js dependencies (if needed)
+        run: npm install || true
+
       - name: Generate media_manifest.json
-        run: |
-          node generate-manifest.js
+        run: node generate-manifest.js
 
       - name: Commit and push manifest
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add media_manifest.json
-          git commit -m "Auto-generate media manifest"
+          git diff --cached --quiet || git commit -m "Auto-generate media manifest"
           git push
