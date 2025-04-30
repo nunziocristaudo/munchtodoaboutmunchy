@@ -51,10 +51,12 @@
     }
   </style>
 </head>
-<body>
+<body oncontextmenu="return false">
   <div id="media-container"></div>
   <script>
     // 🕵️ Secret: The answers float at midnight.
+
+    document.addEventListener("contextmenu", (e) => e.preventDefault());
 
     const container = document.getElementById("media-container");
     const screenW = window.innerWidth;
@@ -65,7 +67,14 @@
     fetch("media_manifest.json")
       .then((res) => res.json())
       .then((files) => {
-        files.forEach((file, index) => {
+        // Adjust media count based on screen size
+        let maxItems = 100;
+        if (screenW < 768) maxItems = 30;          // small devices
+        else if (screenW < 1200) maxItems = 60;    // tablets/small laptops
+
+        const shuffled = files.sort(() => 0.5 - Math.random()).slice(0, maxItems);
+
+        shuffled.forEach((file, index) => {
           const isVideo = file.endsWith(".mp4");
           const el = isVideo ? document.createElement("video") : document.createElement("img");
           el.src = file;
@@ -77,6 +86,7 @@
             el.autoplay = true;
             el.muted = true;
             el.loop = true;
+            el.controlsList = "nodownload";
           }
           el.addEventListener("click", () => {
             openLightbox(file, isVideo);
@@ -101,6 +111,7 @@
       if (isVideo) {
         content.controls = true;
         content.autoplay = true;
+        content.controlsList = "nodownload";
       }
       lightbox.appendChild(content);
       lightbox.addEventListener("click", () => document.body.removeChild(lightbox));
