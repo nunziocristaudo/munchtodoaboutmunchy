@@ -51,10 +51,12 @@
     }
   </style>
 </head>
-<body>
+<body oncontextmenu="return false">
   <div id="media-container"></div>
   <script>
     // 🕵️ Secret: The answers float at midnight.
+
+    document.addEventListener("contextmenu", (e) => e.preventDefault());
 
     const container = document.getElementById("media-container");
     const screenW = window.innerWidth;
@@ -77,6 +79,7 @@
             el.autoplay = true;
             el.muted = true;
             el.loop = true;
+            el.controlsList = "nodownload";
           }
           el.addEventListener("click", () => {
             openLightbox(file, isVideo);
@@ -101,6 +104,7 @@
       if (isVideo) {
         content.controls = true;
         content.autoplay = true;
+        content.controlsList = "nodownload";
       }
       lightbox.appendChild(content);
       lightbox.addEventListener("click", () => document.body.removeChild(lightbox));
