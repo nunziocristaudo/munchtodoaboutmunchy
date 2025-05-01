@@ -71,46 +71,52 @@
     const container = document.getElementById("media-container");
     const screenW = window.innerWidth;
     const screenH = window.innerHeight;
-
     let sheepClicks = 0;
 
-    fetch("media_manifest.json")
-      .then((res) => res.json())
-      .then((files) => {
-        let maxItems = 100;
-        if (screenW < 768) maxItems = 30;
-        else if (screenW < 1200) maxItems = 60;
+    function loadMedia() {
+      container.innerHTML = ""; // clear old media
 
-        const shuffled = files.sort(() => 0.5 - Math.random()).slice(0, maxItems);
+      fetch("media_manifest.json")
+        .then((res) => res.json())
+        .then((files) => {
+          let maxItems = 100;
+          if (screenW < 768) maxItems = 30;
+          else if (screenW < 1200) maxItems = 60;
 
-        shuffled.forEach((file, index) => {
-          const isVideo = file.endsWith(".mp4");
-          const el = isVideo ? document.createElement("video") : document.createElement("img");
-          el.src = file;
-          el.className = "media";
-          el.style.left = Math.random() * screenW + "px";
-          el.style.top = Math.random() * screenH + "px";
-          el.style.animation = `float${index % 5} ${20 + Math.random() * 30}s linear infinite`;
-          if (isVideo) {
-            el.autoplay = true;
-            el.muted = true;
-            el.loop = true;
-            el.controlsList = "nodownload";
-          }
-          el.addEventListener("click", () => {
-            openLightbox(file, isVideo);
-            if (file.toLowerCase().includes("sheep")) {
-              sheepClicks++;
-              if (sheepClicks === 3) {
-                alert("✨ Clue unlocked: Midnight isn’t always on the clock.");
-                sheepClicks = 0;
-              }
+          const shuffled = files.sort(() => 0.5 - Math.random()).slice(0, maxItems);
+
+          shuffled.forEach((file, index) => {
+            const isVideo = file.endsWith(".mp4");
+            const el = isVideo ? document.createElement("video") : document.createElement("img");
+            el.src = file;
+            el.className = "media";
+            el.style.left = Math.random() * screenW + "px";
+            el.style.top = Math.random() * screenH + "px";
+            el.style.animation = `float${index % 5} ${20 + Math.random() * 30}s linear infinite`;
+
+            if (isVideo) {
+              el.autoplay = true;
+              el.muted = true;
+              el.loop = true;
+              el.controlsList = "nodownload";
             }
+
+            el.addEventListener("click", () => {
+              openLightbox(file, isVideo);
+              if (file.toLowerCase().includes("sheep")) {
+                sheepClicks++;
+                if (sheepClicks === 3) {
+                  alert("✨ Clue unlocked: Midnight isn’t always on the clock.");
+                  sheepClicks = 0;
+                }
+              }
+            });
+
+            container.appendChild(el);
           });
-          container.appendChild(el);
-        });
-      })
-      .catch((err) => console.error("Failed to load media manifest:", err));
+        })
+        .catch((err) => console.error("Failed to load media manifest:", err));
+    }
 
     function openLightbox(src, isVideo) {
       const lightbox = document.createElement("div");
@@ -127,6 +133,7 @@
       document.body.appendChild(lightbox);
     }
 
+    // Inject floating animation styles
     const style = document.createElement("style");
     for (let i = 0; i < 5; i++) {
       style.innerHTML += `
@@ -145,11 +152,17 @@
     }
     document.head.appendChild(style);
 
-    // ✅ Register service worker
+    // Load media initially
+    loadMedia();
+
+    // Refresh every hour (3600000 ms)
+    setInterval(loadMedia, 1000 * 60 * 60);
+
+    // Register service worker for PWA
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js')
+      navigator.serviceWorker.register('/munchtodoaboutmunchy/service-worker.js')
         .then(() => console.log("✅ Service Worker registered"))
-        .catch((err) => console.error("❌ Service Worker error:", err));
+        .catch((err) => console.error("❌ Service Worker registration failed:", err));
     }
   </script>
 </body>
